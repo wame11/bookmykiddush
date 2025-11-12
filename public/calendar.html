@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Booking Calendar</title>
+
+    <!-- FullCalendar core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/main.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.8/main.min.css" rel="stylesheet" />
+
+    <style>
+      body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f6fbff; margin:30px; }
+      .calendar-card {
+        background:white;
+        border-radius:12px;
+        padding:18px;
+        box-shadow:0 6px 22px rgba(20,40,60,0.06);
+        max-width:980px;
+      }
+      #calendar { max-width: 880px; margin: 8px auto; }
+      /* Visual for disabled days */
+      .fc-daygrid-day.disabled {
+        background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(245,250,255,0.6));
+        color: #b0b6bd;
+        pointer-events: none;
+        opacity: 0.7;
+      }
+      .fc-daygrid-day.saturday-allowed {
+        cursor: pointer;
+        background: white;
+      }
+      .fc .fc-toolbar-title { font-weight:700; font-size:1.6rem; }
+    </style>
+  </head>
+  <body>
+    <section class="calendar-card">
+      <h1 style="margin:0 0 6px 0;">Choose your date</h1>
+      <p style="margin:0 0 14px 0; color:#617083;">Only Saturdays and preset Festivals are available.</p>
+
+      <div id="calendar"></div>
+    </section>
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.8/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.8/main.min.js"></script>
+
+    <script>
+      // CONFIG: add ISO date strings for preset festival dates (yyyy-mm-dd)
+      const FESTIVAL_DATES = [
+        // Example: "2025-12-25", "2026-04-23"
+      ];
+
+      // Utility: whether a date (Date or string) is allowed
+      function isAllowedDate(date) {
+        const d = (date instanceof Date) ? date : new Date(date);
+        const iso = d.toISOString().slice(0,10); // yyyy-mm-dd
+        if (FESTIVAL_DATES.includes(iso)) return true;
+        return d.getDay() === 6; // Saturday
+      }
+
+      // This function is called when a valid date is clicked.
+      // Replace the body here with whatever you want to run
+      // or define window.onDateSelected elsewhere to handle it.
+      function runSelectedDate(isoDate) {
+        if (typeof window.onDateSelected === "function") {
+          try { window.onDateSelected(isoDate); return; } catch (err) { console.error(err); }
+        }
+        console.log("Selected date:", isoDate);
+        alert("Selected date: " + isoDate + "\nReplace runSelectedDate() with your code.");
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+          plugins: [ 'dayGrid', 'interaction' ],
+          initialView: 'dayGridMonth',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: ''
+          },
+          dayCellDidMount: function(arg) {
+            const date = arg.date;
+            if (isAllowedDate(date)) {
+              arg.el.classList.add('saturday-allowed');
+            } else {
+              arg.el.classList.add('disabled');
+            }
+          },
+          dateClick: function(info) {
+            if (!isAllowedDate(info.date)) return;
+            const confirmMsg = `Run booking code for ${info.dateStr}?`;
+            if (confirm(confirmMsg)) {
+              runSelectedDate(info.dateStr);
+            }
+          },
+          events: FESTIVAL_DATES.map(d => ({ title: 'Festival', start: d, allDay: true, display: 'background' })),
+        });
+
+        calendar.render();
+      });
+    </script>
+  </body>
+</html>
