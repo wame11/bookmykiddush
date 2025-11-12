@@ -160,13 +160,14 @@ function renderForm(){
       const fd=new FormData(form);
       const rec={date:iso,name:fd.get("name"),email:fd.get("email"),dedication:fd.get("dedication")||"",synagogue:"Hadley Wood Shul"};
       userEmail=rec.email;
-      const res=await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(rec)});
+      cconst res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(rec)});
+
       const out=await res.json();
       if(out.status==="success"){document.getElementById("savedMsg").textContent="Saved ✔";document.getElementById("savedMsg").classList.remove("hidden");await fetchBookings();}
       else alert(out.message||"Error submitting booking");
-    };
+    
   }
-}
+
 
 function renderBookings(){
   bookingsList.innerHTML=bookings.length?bookings.map(b=>{
@@ -177,7 +178,7 @@ function renderBookings(){
 
 async function deleteBooking(date){
   if(!confirm("Delete your booking for "+date+"?"))return;
-  const res=await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:'delete',date:date})});
+   const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"delete",date:date})});
   const out=await res.json();
   if(out.status==="success"){await fetchBookings();}
 }
