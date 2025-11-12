@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Book My Kiddush — Hadley Wood Shul</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    body { background: linear-gradient(to bottom,#eef2ff,white); }
+    .card { background: rgba(255,255,255,0.85); backdrop-filter: saturate(1.2) blur(2px); }
+    .chip { font-size: 10px; padding: .125rem .5rem; border-radius: 9999px; }
+    #loading { display: none; text-align: center; padding: 1rem; color: #555; }
+  </style>
+</head>
+<body class="text-gray-900">
+<header class="sticky top-0 z-40 bg-white bg-opacity-70 backdrop-filter backdrop-blur border-b">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="#home" class="font-black tracking-tight text-xl">Book My Kiddush</a>
+    <nav class="hidden md:flex gap-6 text-sm font-medium">
+      <a href="#calendar" class="hover:text-indigo-600">Calendar</a>
+      <a href="#faq" class="hover:text-indigo-600">FAQ</a>
+      <a href="#contact" class="hover:text-indigo-600">Contact</a>
+    </nav>
+    <a href="#calendar" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700">Sponsor</a>
+  </div>
+</header>
+
+<main id="home" class="relative overflow-hidden">
+  <section class="max-w-6xl mx-auto px-4 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
+    <div>
+      <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Reserve your Kiddush date</h1>
+      <p class="mt-4 text-lg text-gray-700">
+        Select an available <strong>Shabbat</strong> or <strong>Festival</strong> date to sponsor the Kiddush at <strong>Hadley Wood Shul</strong>.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href="#calendar" class="px-5 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700">Open Calendar</a>
+      </div>
+    </div>
+    <div class="p-4">
+      <div class="aspect-video rounded-2xl border shadow-lg bg-white grid place-items-center">
+        <p class="text-gray-600">Book your Kiddush date quickly and easily.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section id="calendar" class="max-w-6xl mx-auto px-4 py-16">
+  <h2 class="text-2xl md:text-3xl font-bold">Choose your date</h2>
+  <p class="mt-2 text-gray-700">Only Saturdays and preset Festivals are available.</p>
+  <div id="loading">Loading calendar...</div>
+  <div class="mt-6 grid md:grid-cols-2 gap-8 items-start">
+    <div class="card p-4 rounded-2xl border shadow-sm">
+      <div class="flex items-center justify-between">
+        <button id="prevBtn" class="px-3 py-2 rounded-lg border hover:bg-gray-50">Prev</button>
+        <h3 id="monthLabel" class="text-lg font-semibold"></h3>
+        <button id="nextBtn" class="px-3 py-2 rounded-lg border hover:bg-gray-50">Next</button>
+      </div>
+      <div class="grid grid-cols-7 gap-2 mt-4 text-sm text-center font-medium text-gray-600">
+        <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+      </div>
+      <div id="grid" class="grid grid-cols-7 gap-2 mt-2"></div>
+    </div>
+    <div class="space-y-6">
+      <div id="formBox" class="card p-6 rounded-2xl border shadow-sm text-sm text-gray-700">
+        <p>Select an available date to sponsor the Kiddush at <strong>Hadley Wood Shul</strong>.</p>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-2">Upcoming bookings</h3>
+        <div id="bookingsList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 py-16">
+    <h2 class="text-2xl md:text-3xl font-bold">FAQ</h2>
+    <div class="mt-6 grid md:grid-cols-2 gap-6">
+      <div class="p-6 rounded-2xl border bg-white">
+        <h3 class="font-semibold">Which dates are available?</h3>
+        <p class="text-sm text-gray-700 mt-2">The calendar automatically enables only Shabbat and Festival days.</p>
+      </div>
+      <div class="p-6 rounded-2xl border bg-white">
+        <h3 class="font-semibold">How do I get confirmation?</h3>
+        <p class="text-sm text-gray-700 mt-2">An email is sent automatically once your booking is submitted.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="bg-white">
+  <div class="max-w-6xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-8 items-start">
+    <div>
+      <h2 class="text-2xl font-bold">Contact</h2>
+      <p class="mt-2 text-gray-700">For any Kiddush sponsorship questions, please contact the synagogue office.</p>
+    </div>
+    <div class="p-6 rounded-2xl border bg-white bg-opacity-80 text-sm text-gray-700">
+      <p>© <span id="year"></span> Book My Kiddush — Hadley Wood Shul</p>
+    </div>
+  </div>
+</section>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyInW2BjghJb0NP4_5XGZSxtCdERZJnVo9Q_QbqW81YWojS1eYvlO--boR4dLHydng/exec";
+const pad=n=>n<10?"0"+n:n;
+const toISO=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const FESTIVALS=new Set(["2025-04-13","2025-04-14","2025-04-19","2025-04-20","2025-06-02","2025-06-03","2025-09-23","2025-09-24","2025-10-07","2025-10-08","2025-10-14","2025-10-15","2026-04-02","2026-04-03","2026-04-08","2026-04-09","2026-05-22","2026-05-23","2026-09-12","2026-09-13","2026-09-26","2026-09-27","2026-10-03","2026-10-04"]);
+let bookings=[],viewDate=new Date(),selected=null,userEmail=null;
+const grid=document.getElementById("grid"),monthLabel=document.getElementById("monthLabel"),prevBtn=document.getElementById("prevBtn"),nextBtn=document.getElementById("nextBtn"),formBox=document.getElementById("formBox"),bookingsList=document.getElementById("bookingsList"),loading=document.getElementById("loading");
+document.getElementById("year").textContent=new Date().getFullYear();
+
+async function fetchBookings(){
+  loading.style.display="block";
+  try{
+    const res=await fetch(SCRIPT_URL);
+    bookings=await res.json();
+  }catch(e){console.error("Fetch failed",e);bookings=[];}
+  loading.style.display="none";
+  renderCalendar();
+  renderBookings();
+}
+
+function startOfMonth(d){return new Date(d.getFullYear(),d.getMonth(),1);}
+function addMonths(d,m){const x=new Date(d);x.setMonth(x.getMonth()+m);return x;}
+function getMonthMatrix(v){const s=startOfMonth(v);const f=(s.getDay()+6)%7;const g=[];let c=new Date(s);c.setDate(c.getDate()-f);for(let w=0;w<6;w++){const r=[];for(let d=0;d<7;d++){r.push(new Date(c));c.setDate(c.getDate()+1);}g.push(r);}return g;}
+function isSelectableDate(d){const todayISO=toISO(new Date());const iso=toISO(d);if(iso<todayISO)return false;const dow=d.getDay();return dow===6||FESTIVALS.has(iso);}
+
+function renderCalendar(){
+  monthLabel.textContent=viewDate.toLocaleString(undefined,{month:"long",year:"numeric"});
+  grid.innerHTML="";
+  const m=getMonthMatrix(viewDate);
+  const inM=d=>d.getMonth()===viewDate.getMonth();
+  for(const d of m.flat()){
+    const iso=toISO(d);
+    const taken=bookings.some(b=>b.date===iso);
+    const sel=isSelectableDate(d)&&inM(d)&&!taken;
+    const cell=document.createElement("button");
+    cell.className="h-24 rounded-xl border flex flex-col items-center justify-center gap-1 "+(sel?"bg-white hover:bg-indigo-50":"bg-gray-50 text-gray-400");
+    cell.disabled=!sel;
+    cell.innerHTML=`<span class='text-base font-semibold'>${d.getDate()}</span><span class='text-[11px]'>${iso}</span>${taken?'<span class="chip bg-red-100 text-red-700">Booked</span>':sel?'<span class="chip bg-green-100 text-green-700">Available</span>':""}`;
+    if(sel){
+      cell.addEventListener("click",()=>{selected=new Date(d);renderForm();});
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function renderForm(){
+  if(!selected){formBox.innerHTML="<p>Select an available date to sponsor the Kiddush at <strong>Hadley Wood Shul</strong>.</p>";return;}
+  const iso=toISO(selected);
+  const taken=bookings.some(b=>b.date===iso);
+  formBox.innerHTML=`<div class='flex items-center justify-between gap-3'><h3 class='text-xl font-semibold'>${selected.toLocaleDateString()}</h3><button id='changeDate' class='text-sm underline'>Change</button></div>${taken?"<p class='mt-3 p-3 bg-red-50 border text-red-800 text-sm'>This date is already booked.</p>":""}<form id='bookingForm' class='mt-4 grid md:grid-cols-2 gap-4'><div><label class='block text-sm font-medium'>Full name</label><input required name='name' class='mt-1 w-full rounded-xl border px-3 py-2'></div><div><label class='block text-sm font-medium'>Email</label><input required type='email' name='email' class='mt-1 w-full rounded-xl border px-3 py-2'></div><div><label class='block text-sm font-medium'>Synagogue</label><input disabled value='Hadley Wood Shul' class='mt-1 w-full rounded-xl border px-3 py-2 bg-gray-100 text-gray-600'></div><div><label class='block text-sm font-medium'>Dedication (optional)</label><input name='dedication' class='mt-1 w-full rounded-xl border px-3 py-2'></div><div class='md:col-span-2 flex flex-wrap items-center gap-3'><button ${taken?"disabled":""} class='px-5 py-3 rounded-xl text-white font-semibold ${taken?"bg-gray-400":"bg-indigo-600 hover:bg-indigo-700"}'>Reserve date</button><span id='savedMsg' class='text-sm hidden'>&nbsp;</span></div></form>`;
+  document.getElementById("changeDate").onclick=()=>{selected=null;renderForm();};
+  const form=document.getElementById("bookingForm");
+  if(form){
+    form.onsubmit=async e=>{
+      e.preventDefault();
+      if(taken)return;
+      const fd=new FormData(form);
+      const rec={date:iso,name:fd.get("name"),email:fd.get("email"),dedication:fd.get("dedication")||"",synagogue:"Hadley Wood Shul"};
+      userEmail=rec.email;
+      const res=await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(rec)});
+      const out=await res.json();
+      if(out.status==="success"){document.getElementById("savedMsg").textContent="Saved ✔";document.getElementById("savedMsg").classList.remove("hidden");await fetchBookings();}
+      else alert(out.message||"Error submitting booking");
+    };
+  }
+}
+
+function renderBookings(){
+  bookingsList.innerHTML=bookings.length?bookings.map(b=>{
+    const canRemove=(userEmail && userEmail===b.email);
+    return `<div class='p-4 rounded-xl border bg-white flex justify-between'><div><p class='font-semibold'>${new Date(b.date).toLocaleDateString()} — ${b.name}</p>${b.dedication?`<p class='text-gray-600'>${b.dedication}</p>`:""}</div>${canRemove?`<button class='px-3 py-2 rounded-lg border text-sm hover:bg-gray-50' onclick='deleteBooking("${b.date}")'>Remove</button>`:""}</div>`;
+  }).join(""):"<div class='p-4 rounded-xl bg-gray-50 border text-sm text-gray-600'>No bookings yet.</div>";
+}
+
+async function deleteBooking(date){
+  if(!confirm("Delete your booking for "+date+"?"))return;
+  const res=await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:'delete',date:date})});
+  const out=await res.json();
+  if(out.status==="success"){await fetchBookings();}
+}
+
+prevBtn.onclick=()=>{viewDate=addMonths(viewDate,-1);renderCalendar();};
+nextBtn.onclick=()=>{viewDate=addMonths(viewDate,1);renderCalendar();};
+fetchBookings();
+</script>
+</body>
+</html>
