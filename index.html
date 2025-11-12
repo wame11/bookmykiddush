@@ -160,7 +160,7 @@ function renderForm(){
       const fd=new FormData(form);
       const rec={date:iso,name:fd.get("name"),email:fd.get("email"),dedication:fd.get("dedication")||"",synagogue:"Hadley Wood Shul"};
       userEmail=rec.email;
-      cconst res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(rec)});
+      const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(rec)});
 
       const out=await res.json();
       if(out.status==="success"){document.getElementById("savedMsg").textContent="Saved ✔";document.getElementById("savedMsg").classList.remove("hidden");await fetchBookings();}
